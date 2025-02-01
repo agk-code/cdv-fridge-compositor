@@ -1,0 +1,84 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>fridge-composer</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    #fridge {
+      border: 2px solid #000;
+      padding: 20px;
+      width: 300px;
+      background-color: #f0f0f0;
+    }
+    .item {
+      margin-bottom: 10px;
+    }
+    .item input {
+      width: 50px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Fridge</h1>
+  <div id="fridge">
+    <h2>Fridge Contents</h2>
+    <div id="items"></div>
+    <form id="add-item-form">
+      <input type="text" id="item-name" placeholder="Item name" required>
+      <input type="number" id="item-quantity" placeholder="Quantity" required>
+      <button type="submit">Add to Fridge</button>
+    </form>
+  </div>
+
+  <script>
+    // Fetch and display fridge contents
+    async function loadFridge() {
+      const response = await fetch('/api/fridge');
+      const items = await response.json();
+      const itemsContainer = document.getElementById('items');
+      itemsContainer.innerHTML = items.map(item => `
+        <div class="item">
+          <span>${item.name}</span>
+          <input type="number" value="${item.quantity}" onchange="updateQuantity('${item.name}', this.value)">
+        </div>
+      `).join('');
+    }
+
+    // Add item to fridge
+    document.getElementById('add-item-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = document.getElementById('item-name').value;
+      const quantity = document.getElementById('item-quantity').value;
+
+      await fetch('/api/fridge', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, quantity: parseInt(quantity) })
+      });
+
+      document.getElementById('item-name').value = '';
+      document.getElementById('item-quantity').value = '';
+      loadFridge();
+    });
+
+    // Update item quantity
+    async function updateQuantity(name, quantity) {
+      await fetch(`/api/fridge/${name}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ quantity: parseInt(quantity) })
+      });
+      loadFridge();
+    }
+
+    // Load fridge contents on page load
+    loadFridge();
+  </script>
+</body>
+</html>
