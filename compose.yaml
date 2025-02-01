@@ -46,7 +46,7 @@ services:
   backend:
     build: 
       context: .
-      dockerfile: ./backend
+      dockerfile: ./backend/Dockerfile
     container_name: oven-backend
     working_dir: /app
     volumes:
