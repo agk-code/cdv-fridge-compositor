@@ -44,7 +44,9 @@ services:
 
   # Node.js Backend
   backend:
-    image: node@sha256:3ac002b133fd3737c44b66f0d023f5d75c7a1ddec71954fa06486aed6aead888
+    build: 
+      context: .
+      dockerfile: ./backend
     container_name: oven-backend
     working_dir: /app
     volumes:
@@ -62,7 +64,7 @@ services:
       - redis
       - postgres
     hostname: oven
-    run: "npm ci && npm run fridge-backend"
+    
 
   worker:
     image: node@sha256:3ac002b133fd3737c44b66f0d023f5d75c7a1ddec71954fa06486aed6aead888
