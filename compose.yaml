@@ -1,6 +1,5 @@
 version: '0.1'
 
-
 # Custom Docker Network
 networks:
   pizza-network:
@@ -10,7 +9,7 @@ services:
   # Nginx Load Balancer
   nginx-lb:
     image: nginx@sha256:4d5c9a3437fc6b4d886c7c65ca59a1851120e9e63a4951a7d7cb7a4155501383
-    container_name: nginx-lb
+    container_name: cashier-nginx-lb
     ports:
       - "80:80"
     volumes:
@@ -20,30 +19,33 @@ services:
     depends_on:
       - nginx1
       - nginx2
+    hostname: cashier
 
   # Nginx Servers
   nginx1:
     image: nginx@sha256:4d5c9a3437fc6b4d886c7c65ca59a1851120e9e63a4951a7d7cb7a4155501383
-    container_name: nginx1
+    container_name: shovel1-nginx1
     volumes:
       - ./frontend:/usr/share/nginx/html:ro
       - ./nginx1.conf:/etc/nginx/conf.d/default.conf:ro
     networks:
       - pizza-network
+    hostname: shovel1
 
   nginx2:
     image: nginx@sha256:4d5c9a3437fc6b4d886c7c65ca59a1851120e9e63a4951a7d7cb7a4155501383
-    container_name: nginx2
+    container_name: shovel2-nginx2
     volumes:
       - ./frontend:/usr/share/nginx/html:ro
       - ./nginx2.conf:/etc/nginx/conf.d/default.conf:ro
     networks:
       - pizza-network
+    hostname: shovel2
 
   # Node.js Backend
   backend:
     image: node@sha256:3ac002b133fd3737c44b66f0d023f5d75c7a1ddec71954fa06486aed6aead888
-    container_name: backend
+    container_name: oven-backend
     working_dir: /app
     volumes:
       - ./backend:/app
@@ -59,10 +61,11 @@ services:
     depends_on:
       - redis
       - postgres
+    hostname: oven
 
   worker:
     image: node@sha256:3ac002b133fd3737c44b66f0d023f5d75c7a1ddec71954fa06486aed6aead888
-    container_name: worker
+    container_name: pizza-man-worker
     working_dir: /app
     volumes:
       - ./backend:/app
@@ -79,11 +82,12 @@ services:
     depends_on:
       - redis
       - postgres
+    hostname: pizza-man
 
   # Redis
   redis:
     image: redis@sha256:bb226f09bb6370390843a16a91cddef7d4c2ee3cbe8e3d4814e971386d866c7b
-    container_name: redis
+    container_name: pepperoni-redis
     ports:
       - "6379:6379"
     networks:
@@ -93,7 +97,7 @@ services:
   # PostgreSQL
   postgres:
     image: postgres@sha256:2f2a8c2a7d10862e7fba2602e304523554f9df8244c632dafe2628ccb398fb5c
-    container_name: postgres
+    container_name: mushroom-postgres
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
