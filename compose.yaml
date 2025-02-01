@@ -1,5 +1,11 @@
 version: '0.1'
 
+
+# Custom Docker Network
+networks:
+  pizza-network:
+    driver: bridge
+
 services:
   # Nginx Load Balancer
   nginx-lb:
@@ -54,7 +60,7 @@ services:
       - redis
       - postgres
 
-    worker:
+  worker:
     image: node@sha256:3ac002b133fd3737c44b66f0d023f5d75c7a1ddec71954fa06486aed6aead888
     container_name: worker
     working_dir: /app
@@ -98,7 +104,3 @@ services:
       - pizza-network
     hostname: mushroom
 
-# Custom Docker Network
-networks:
-  pizza-network:
-    driver: bridge
