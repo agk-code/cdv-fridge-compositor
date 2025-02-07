@@ -13,7 +13,7 @@ services:
     ports:
       - "80:80"
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - frontend:./frontend
     networks:
       - pizza-network
     hostname: cashier
@@ -83,3 +83,6 @@ services:
       - pizza-network
     hostname: mushroom
 
+volumes:
+  frontend:
+    external: true
