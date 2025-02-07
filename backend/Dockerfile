@@ -7,5 +7,7 @@ RUN npm install
 RUN npm install redis
 RUN npm install express
 RUN npm install pg
-COPY ./* /app
-RUN npm run start
+
+COPY ./src .
+
+CMD [ "npm", "start" ]
