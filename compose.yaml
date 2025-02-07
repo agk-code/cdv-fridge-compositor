@@ -14,8 +14,6 @@ services:
     container_name: cashier-nginx
     ports:
       - "80:80"
-    volumes:
-      - frontend:./frontend
     networks:
       - pizza-network
     hostname: cashier
