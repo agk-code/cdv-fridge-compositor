@@ -9,16 +9,13 @@ services:
   # Nginx server
   nginx-lb:
     image: nginx@sha256:4d5c9a3437fc6b4d886c7c65ca59a1851120e9e63a4951a7d7cb7a4155501383
-    container_name: cashier-nginx-lb
+    container_name: cashier-nginx
     ports:
       - "80:80"
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
     networks:
       - pizza-network
-    depends_on:
-      - nginx1
-      - nginx2
     hostname: cashier
 
 
