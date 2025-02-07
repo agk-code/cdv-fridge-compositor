@@ -4,3 +4,7 @@ RUN mkdir /app
 WORKDIR /app
 COPY ./* /app
 RUN npm install
+RUN npm install redis
+RUN npm install express
+RUN npm install pg
+CMD [ "npm", "start" ]
