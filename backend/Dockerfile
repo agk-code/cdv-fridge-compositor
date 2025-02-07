@@ -8,4 +8,4 @@ RUN npm install redis
 RUN npm install express
 RUN npm install pg
 
-CMD [ "npm", "start" ]
+CMD [ "npm", "run", "start" ]
