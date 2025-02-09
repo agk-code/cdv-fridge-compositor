@@ -39,12 +39,16 @@
    cd fridge-composer
    ```
 
-2. Start the application using Docker Compose:
+2. !!IMPORTANT!! - Change API_URL in frontend/index.html to represent your hostname/IP Adress
+    (Have't found a better way to work around that yet :/)
+
+
+3. Start the application using Docker Compose:
    ```bash
    docker-compose up --build
    ```
 
-3. Access the application:
+4. Access the application:
    - Frontend: Open `http://localhost:80` in your browser.
 
 ---
