@@ -51,6 +51,8 @@ def get_fridge_items():
             cur.execute('SELECT * FROM fridge')
             rows = cur.fetchall()
             response = flask.jsonify([{'name': row[0], 'quantity': row[1]} for row in rows])
+            response.headers.add('Access-Control-Allow-Origin', '*')
+            return response
     finally:
         pg_pool.putconn(conn)
 
@@ -84,4 +86,4 @@ def update_fridge_item(name):
 # Start the server
 if __name__ == '__main__':
     init_db()
-    app.run(host='0.0.0.0', port=5000)
+    app.run(debug=True, host='0.0.0.0', port=5000)
