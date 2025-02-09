@@ -9,7 +9,6 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 
 COPY requirements.txt .
-COPY swagger.yaml .
 COPY app.py .
 RUN pip install -r requirements.txt
 
