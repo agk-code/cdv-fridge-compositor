@@ -1,6 +1,6 @@
-# CDV-Fridge-Composer
+# CDV-Fridge-Compositor
 
-**Fridge Composer** is a full-stack web application that allows users to manage items in a virtual fridge. It consists of a **Flask backend API**, a **PostgreSQL database**, a **Redis queue** for asynchronous tasks, and an **Nginx web server** for serving the frontend and proxying API requests.
+**Fridge Compositor** is a full-stack web application that allows users to manage items in a virtual fridge. It consists of a **Flask backend API**, a **PostgreSQL database**, a **Redis queue** for asynchronous tasks, and an **Nginx web server** for serving the frontend and proxying API requests.
 
 ---
 
@@ -35,7 +35,7 @@
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/agk-code/cdv-fridge-composer.git
+   git clone https://github.com/agk-code/cdv-fridge-compositor.git
    cd fridge-composer
    ```
 
