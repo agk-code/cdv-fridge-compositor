@@ -11,78 +11,64 @@ import json
 app = Flask(__name__)
 CORS(app, origins="*")
 
-# Redis client for queueing
-redis_client = redis.Redis(
-    host=os.getenv('REDIS_HOST', 'pepperoni'),
-    port=os.getenv('REDIS_PORT', 6379)
-)
+# In-memory storage for fridge items
+fridge_items = [
+    {"name": "Milk", "quantity": 2},
+    {"name": "Eggs", "quantity": 12},
+    {"name": "Cheese", "quantity": 1}
+]
 
-# PostgreSQL connection pool
-pg_pool = psycopg2.pool.SimpleConnectionPool(
-    minconn=1,
-    maxconn=10,
-    user=os.getenv('POSTGRES_USER', 'postgres'),
-    password=os.getenv('POSTGRES_PASSWORD', 'postgres'),
-    host=os.getenv('POSTGRES_HOST', 'mushroom'),
-    database=os.getenv('POSTGRES_DB', 'fridge')
-)
+# Helper function to find an item by name
+def find_item(name):
+    return next((item for item in fridge_items if item["name"] == name), None)
 
-
-# Get all items in the fridge
+# Get all fridge items
 @app.route('/api/fridge', methods=['GET'])
 def get_fridge_items():
-    conn = pg_pool.getconn()
-    try:
-        with conn.cursor() as cur:
-            cur.execute('SELECT * FROM fridge')
-            rows = cur.fetchall()
-            response = flask.jsonify([{'name': row[1], 'quantity': row[2]} for row in rows])
-            response.headers.add('Access-Control-Allow-Origin', '*')
-            return response
-    finally:
-        pg_pool.putconn(conn)
+    return jsonify(fridge_items)
 
-# Add or update an item in the fridge (queue the request in Redis)
+# Add an item to the fridge
 @app.route('/api/fridge', methods=['POST'])
-def add_fridge_item():
+def add_item():
     data = request.get_json()
     name = data.get('name')
     quantity = data.get('quantity')
-    request_data = {'type': 'add', 'name': name, 'quantity': quantity}
-    try:
-        redis_client.lpush('fridge-queue', json.dumps(request_data))
-        return '', 200
-    except Exception as e:
-        print(f'Error queuing request: {e}')
-        return 'Error queuing request', 500
 
-# Update item quantity (queue the request in Redis)
-@app.route('/api/fridge/<name>', methods=['PUT'])
-def update_fridge_item(name):
+    if not name or not quantity:
+        return jsonify({"error": "Name and quantity are required"}), 400
+
+    existing_item = find_item(name)
+    if existing_item:
+        return jsonify({"error": "Item already exists"}), 400
+
+    fridge_items.append({"name": name, "quantity": quantity})
+    return jsonify({"message": "Item added successfully"}), 201
+
+# Update the quantity of an item
+@app.route('/api/fridge/<string:name>', methods=['PUT'])
+def update_item(name):
     data = request.get_json()
     quantity = data.get('quantity')
-    request_data = {'type': 'update', 'name': name, 'quantity': quantity}
-    try:
-        redis_client.lpush('fridge-queue', json.dumps(request_data))
-        return '', 200
-    except Exception as e:
-        print(f'Error queuing request: {e}')
-        return 'Error queuing request', 500
-    
-# Helper function to delete an item from Redis
-def delete_fridge_item(name):
-    redis_client.hdel('fridge', name)
 
-    
+    if not quantity:
+        return jsonify({"error": "Quantity is required"}), 400
+
+    item = find_item(name)
+    if not item:
+        return jsonify({"error": "Item not found"}), 404
+
+    item["quantity"] = quantity
+    return jsonify({"message": "Item updated successfully"})
+
 # Delete an item from the fridge
 @app.route('/api/fridge/<string:name>', methods=['DELETE'])
 def delete_item(name):
-    if not redis_client.hexists('fridge', name):
+    item = find_item(name)
+    if not item:
         return jsonify({"error": "Item not found"}), 404
 
-    delete_fridge_item(name)
+    fridge_items.remove(item)
     return jsonify({"message": "Item deleted successfully"})
-
 
 # Start the server
 if __name__ == '__main__':
