@@ -37,9 +37,11 @@
   </div>
 
   <script>
+
+    const API_URL = ':3000/api/fridge';
     // Fetch and display fridge contents
     async function loadFridge() {
-      const response = await fetch('/api/fridge');
+      const response = await fetch(`${API_URL}`);
       const items = await response.json();
       const itemsContainer = document.getElementById('items');
       itemsContainer.innerHTML = items.map(item => `
@@ -56,7 +58,7 @@
       const name = document.getElementById('item-name').value;
       const quantity = document.getElementById('item-quantity').value;
 
-      await fetch('/api/fridge', {
+      await fetch(`${API_URL}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, quantity: parseInt(quantity) })
@@ -69,7 +71,7 @@
 
     // Update item quantity
     async function updateQuantity(name, quantity) {
-      await fetch(`/api/fridge/${name}`, {
+      await fetch(`${API_URL}/${name}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ quantity: parseInt(quantity) })
