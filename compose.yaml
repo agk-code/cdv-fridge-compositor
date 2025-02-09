@@ -39,6 +39,24 @@ services:
       - postgres
     hostname: oven
 
+  api:
+    build: ./backend-py
+    ports:
+      - "5000:5000"
+    environment:
+      - REDIS_HOST=pepperoni
+      - REDIS_PORT=6379
+      - POSTGRES_HOST=mushroom
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=fridge
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - pizza-network
+    hostname: oven-py
+
   # Redis
   redis:
     image: redis@sha256:bb226f09bb6370390843a16a91cddef7d4c2ee3cbe8e3d4814e971386d866c7b
