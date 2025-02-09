@@ -40,7 +40,7 @@
    ```
 
 2. !!IMPORTANT!! - Change API_URL in frontend/index.html to represent your hostname/IP Adress
-    (Have't found a better way to work around that yet :/)
+    - (Haven't found a better way to work around that yet :/)
 
 
 3. Start the application using Docker Compose:
