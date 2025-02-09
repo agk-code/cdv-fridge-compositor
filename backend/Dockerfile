@@ -8,4 +8,6 @@ RUN npm install redis
 RUN npm install express
 RUN npm install pg
 
+EXPOSE 3000
+
 CMD [ "npm", "run", "start" ]
