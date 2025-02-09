@@ -36,26 +36,6 @@ services:
       - redis
       - postgres
     hostname: oven
-    
-
-  worker:
-    image: node@sha256:3ac002b133fd3737c44b66f0d023f5d75c7a1ddec71954fa06486aed6aead888
-    container_name: pizza-man-worker
-    working_dir: /app
-    environment:
-      - REDIS_HOST=pepperoni
-      - REDIS_PORT=6379
-      - POSTGRES_HOST=mushroom
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=fridge
-    networks:
-      - pizza-network
-    command: node worker.js
-    depends_on:
-      - redis
-      - postgres
-    hostname: pizza-man
 
   # Redis
   redis:
