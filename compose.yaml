@@ -8,9 +8,7 @@ networks:
 services:
   # Nginx server
   nginx:
-    build: 
-      context: .
-      dockerfile: ./backend/Dockerfile
+    build: ./frontend
     container_name: cashier-nginx
     ports:
       - "80:80"
