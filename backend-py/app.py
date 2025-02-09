@@ -68,6 +68,21 @@ def update_fridge_item(name):
     except Exception as e:
         print(f'Error queuing request: {e}')
         return 'Error queuing request', 500
+    
+# Helper function to delete an item from Redis
+def delete_fridge_item(name):
+    redis_client.hdel('fridge', name)
+
+    
+# Delete an item from the fridge
+@app.route('/api/fridge/<string:name>', methods=['DELETE'])
+def delete_item(name):
+    if not redis_client.hexists('fridge', name):
+        return jsonify({"error": "Item not found"}), 404
+
+    delete_fridge_item(name)
+    return jsonify({"message": "Item deleted successfully"})
+
 
 # Start the server
 if __name__ == '__main__':

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>fridge-composer</title>
+  <title>Fridge Composer</title>
   <link rel="icon" type="image/x-icon" href="/snow.ico">
   <style>
     body {
@@ -18,65 +18,159 @@
     }
     .item {
       margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
     .item input {
       width: 50px;
     }
+    .error {
+      color: red;
+      margin-top: 10px;
+    }
+    .loading {
+      color: blue;
+      margin-top: 10px;
+    }
+    .delete-button {
+      background-color: #ff4d4d;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      cursor: pointer;
+    }
+    .delete-button:hover {
+      background-color: #ff1a1a;
+    }
   </style>
 </head>
 <body>
-  <h1>Fridge</h1>
+  <h1>Fridge Composer</h1>
   <div id="fridge">
     <h2>Fridge Contents</h2>
     <div id="items"></div>
+    <div id="error" class="error"></div>
+    <div id="loading" class="loading"></div>
     <form id="add-item-form">
       <input type="text" id="item-name" placeholder="Item name" required>
-      <input type="number" id="item-quantity" placeholder="Quantity" required>
+      <input type="number" id="item-quantity" placeholder="Quantity" min="1" required>
       <button type="submit">Add to Fridge</button>
     </form>
   </div>
 
   <script>
-
     const API_URL = 'http://192.168.1.103:5000/api/fridge';
+
     // Fetch and display fridge contents
     async function loadFridge() {
-      const response = await fetch(`${API_URL}`);
-      const items = await response.json();
-      const itemsContainer = document.getElementById('items');
-      itemsContainer.innerHTML = items.map(item => `
-        <div class="item">
-          <span>${item.name}</span>
-          <input type="number" value="${item.quantity}" onchange="updateQuantity('${item.name}', this.value)">
-        </div>
-      `).join('');
+      try {
+        showLoading('Loading fridge contents...');
+        const response = await fetch(`${API_URL}`);
+        if (!response.ok) throw new Error('Failed to load fridge contents.');
+        const items = await response.json();
+        const itemsContainer = document.getElementById('items');
+        itemsContainer.innerHTML = items.map(item => `
+          <div class="item">
+            <span>${item.name}</span>
+            <input type="number" value="${item.quantity}" min="1" onchange="updateQuantity('${item.name}', this.value)">
+            <button class="delete-button" onclick="deleteItem('${item.name}')">Delete</button>
+          </div>
+        `).join('');
+        clearError();
+      } catch (error) {
+        showError(error.message);
+      } finally {
+        hideLoading();
+      }
     }
 
     // Add item to fridge
     document.getElementById('add-item-form').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const name = document.getElementById('item-name').value;
+      const name = document.getElementById('item-name').value.trim();
       const quantity = document.getElementById('item-quantity').value;
 
-      await fetch(`${API_URL}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, quantity: parseInt(quantity) })
-      });
+      if (!name || quantity < 1) {
+        showError('Please enter a valid item name and quantity.');
+        return;
+      }
 
-      document.getElementById('item-name').value = '';
-      document.getElementById('item-quantity').value = '';
-      loadFridge();
+      try {
+        showLoading('Adding item...');
+        const response = await fetch(`${API_URL}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, quantity: parseInt(quantity) })
+        });
+        if (!response.ok) throw new Error('Failed to add item.');
+        document.getElementById('item-name').value = '';
+        document.getElementById('item-quantity').value = '';
+        loadFridge();
+      } catch (error) {
+        showError(error.message);
+      } finally {
+        hideLoading();
+      }
     });
 
     // Update item quantity
     async function updateQuantity(name, quantity) {
-      await fetch(`${API_URL}/${name}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ quantity: parseInt(quantity) })
-      });
-      loadFridge();
+      if (quantity < 1) {
+        showError('Quantity must be at least 1.');
+        return;
+      }
+
+      try {
+        showLoading('Updating quantity...');
+        const response = await fetch(`${API_URL}/${name}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ quantity: parseInt(quantity) })
+        });
+        if (!response.ok) throw new Error('Failed to update quantity.');
+        loadFridge();
+      } catch (error) {
+        showError(error.message);
+      } finally {
+        hideLoading();
+      }
+    }
+
+    // Delete item from fridge
+    async function deleteItem(name) {
+      try {
+        showLoading('Deleting item...');
+        const response = await fetch(`${API_URL}/${name}`, {
+          method: 'DELETE'
+        });
+        if (!response.ok) throw new Error('Failed to delete item.');
+        loadFridge();
+      } catch (error) {
+        showError(error.message);
+      } finally {
+        hideLoading();
+      }
+    }
+
+    // Show error message
+    function showError(message) {
+      document.getElementById('error').textContent = message;
+    }
+
+    // Clear error message
+    function clearError() {
+      document.getElementById('error').textContent = '';
+    }
+
+    // Show loading message
+    function showLoading(message) {
+      document.getElementById('loading').textContent = message;
+    }
+
+    // Hide loading message
+    function hideLoading() {
+      document.getElementById('loading').textContent = '';
     }
 
     // Load fridge contents on page load
