@@ -46,7 +46,6 @@
 
 3. Access the application:
    - Frontend: Open `http://localhost:80` in your browser.
-   - API Docs: Open `http://localhost:80/api/docs` for Swagger UI.
 
 ---
 
