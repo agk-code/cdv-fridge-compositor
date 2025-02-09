@@ -106,28 +106,6 @@ To stop the application, run:
 ```bash
 docker-compose down
 ```
-
----
-
-## Contributing
-
-Contributions are welcome! Please open an issue or submit a pull request.
-
----
-
-## License
-
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
----
-
-## Acknowledgments
-
-- Flask for the lightweight backend framework.
-- PostgreSQL for reliable data storage.
-- Redis for efficient queueing.
-- Docker for seamless containerization.
-
 ---
 
 Enjoy managing your virtual fridge! 🎉
