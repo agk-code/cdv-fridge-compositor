@@ -27,20 +27,6 @@ pg_pool = psycopg2.pool.SimpleConnectionPool(
     database=os.getenv('POSTGRES_DB', 'fridge')
 )
 
-# Initialize database table
-def init_db():
-    conn = pg_pool.getconn()
-    try:
-        with conn.cursor() as cur:
-            cur.execute('''
-                CREATE TABLE IF NOT EXISTS fridge (
-                    name TEXT PRIMARY KEY,
-                    quantity INT NOT NULL
-                )
-            ''')
-            conn.commit()
-    finally:
-        pg_pool.putconn(conn)
 
 # Get all items in the fridge
 @app.route('/api/fridge', methods=['GET'])
@@ -50,7 +36,7 @@ def get_fridge_items():
         with conn.cursor() as cur:
             cur.execute('SELECT * FROM fridge')
             rows = cur.fetchall()
-            response = flask.jsonify([{'name': row[0], 'quantity': row[1]} for row in rows])
+            response = flask.jsonify([{'name': row[1], 'quantity': row[2]} for row in rows])
             response.headers.add('Access-Control-Allow-Origin', '*')
             return response
     finally:
